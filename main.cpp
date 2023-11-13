@@ -38,7 +38,6 @@ using namespace std::chrono;
 #define minZ -30.0f
 #define maxZ 30.0f
 
-
 class Vec3 {
 public:
     float x, y, z;
@@ -79,7 +78,7 @@ struct Box {
 // gravity - change it and see what happens (usually negative!)
 const float gravity = -19.81f;
 std::vector<Box> boxes;
-/*
+
 void forkexample()
 {
     //child process returns value zero
@@ -91,7 +90,7 @@ void forkexample()
         printf("Hello from Parent!\n");
     }
 }
-*/
+
 
 #define ReadEnd 0
 #define WriteEnd 1
@@ -107,21 +106,20 @@ void PipeExample()
 
     if(p>0) { //parent process
         close(fd1[ReadEnd]); //close reading end
-        write(fd1[WriteEnd], "hello", strlen("hello")+1); //write string to pipe
+        write(fd1[WriteEnd], "hello from pipe", strlen("hello from pipe")+1); //write string to pipe
         close(fd1[WriteEnd]); //close the write end
     }
     else if(p==0) { //child process
         close(fd1[WriteEnd]); //close write end
         char str[100];
         read(fd1[ReadEnd], str, 100); //read in data
-        printf("%s", str);
+        printf("%s\n", str);
         close(fd1[ReadEnd]); //close read end
         exit(0);
     }
 }
 
 void initScene(int boxCount) {
-    PipeExample();
     for (int i = 0; i < boxCount; ++i) {
         Box box;
 
@@ -363,7 +361,6 @@ void idle() {
     last = steady_clock::now();
     const duration<float> frameTime = last - old;
     float deltaTime = frameTime.count();
-
     updatePhysics(deltaTime);
 
     // tell glut to draw - note this will cap this function at 60 fps
@@ -441,6 +438,7 @@ int main(int argc, char** argv) {
     glMatrixMode(GL_MODELVIEW);
 
     initScene(NUMBER_OF_BOXES);
+    PipeExample();
     glutDisplayFunc(display);
     glutIdleFunc(idle);
     // it will stick here until the program ends.
