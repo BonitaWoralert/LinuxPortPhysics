@@ -1,0 +1,3 @@
+/home/bonita/CLionProjects/LinuxPort/cmake-build-debug/CMakeFiles/LinuxPort.dir
+/home/bonita/CLionProjects/LinuxPort/cmake-build-debug/CMakeFiles/edit_cache.dir
+/home/bonita/CLionProjects/LinuxPort/cmake-build-debug/CMakeFiles/rebuild_cache.dir
