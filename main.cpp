@@ -79,7 +79,7 @@ struct Box {
 const float gravity = -19.81f;
 std::vector<Box> boxes;
 
-void forkexample()
+void ForkExample()
 {
     //child process returns value zero
     if (fork() == 0) {
@@ -97,23 +97,30 @@ void forkexample()
 
 void PipeExample()
 {
+    int i;
     int fd1[2]; //store 2 ends of pipe
+
     if (pipe(fd1)==-1) { //attempt to create pipe
         //idk
+        std::cout << "\nCould not create pipe.";
     }
 
     pid_t p = fork();
 
     if(p>0) { //parent process
         close(fd1[ReadEnd]); //close reading end
-        write(fd1[WriteEnd], "hello from pipe", strlen("hello from pipe")+1); //write string to pipe
+        //write(fd1[WriteEnd], "hello from pipe", strlen("hello from pipe")+1); //write string to pipe
+        i = 5;
+        write(fd1[WriteEnd], &i, sizeof(i));
         close(fd1[WriteEnd]); //close the write end
     }
     else if(p==0) { //child process
         close(fd1[WriteEnd]); //close write end
-        char str[100];
-        read(fd1[ReadEnd], str, 100); //read in data
-        printf("%s\n", str);
+        //char str[100];
+        //read(fd1[ReadEnd], str, 100); //read in data
+        read(fd1[ReadEnd], &i, sizeof(i));
+        std::cout << i << std::endl;
+        //printf("%s\n", i);
         close(fd1[ReadEnd]); //close read end
         exit(0);
     }
@@ -241,8 +248,28 @@ bool checkCollision(const Box& a, const Box& b) {
 // update the physics: gravity, collision test, collision resolution
 void updatePhysics(const float deltaTime) {
     const float floorY = 0.0f;
+    /*
+    int fd1[2];
+    pid_t p1 = fork(); //first child
+    pid_t p2 = fork(); //second child + grandchild/third child (first child also executes this line)
 
-
+    if(p1 > 0 && p2 > 0)
+    {
+        //parent process
+    }
+    else if(p1 == 0 && p2 > 0)
+    {
+        //first child
+    }
+    else if(p1 > 0 && p2 == 0)
+    {
+        //second child
+    }
+    else
+    {
+        //third child
+    }
+    */
     for (Box& box : boxes) {
         // Update velocity due to gravity
         box.velocity.y += gravity * deltaTime;
