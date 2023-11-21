@@ -17,7 +17,7 @@
 #include <stdio.h>
 #include <sys/types.h>
 #include <string.h>
-#include "Boxes.h"
+#include "BoxManager.h"
 using namespace std::chrono;
 
 // this is the number of falling physical items.
@@ -113,29 +113,14 @@ void PThreadsExample()
 }
 
 void initScene(int boxCount) {
+    //declare everything for threads
     pthread_t physThread1, physThread2, physThread3;
     int pt1,pt2,pt3;
 
+    auto* _boxManager = new BoxManager();
+
     for (int i = 0; i < boxCount; ++i) {
-        Box box;
-
-        // Assign random x, y, and z positions within specified ranges
-        box.position.x = static_cast<float>(rand()) / (static_cast<float>(RAND_MAX / 20.0f));
-        box.position.y = 10.0f + static_cast<float>(rand()) / (static_cast<float>(RAND_MAX / 1.0f));
-        box.position.z = static_cast<float>(rand()) / (static_cast<float>(RAND_MAX / 20.0f));
-
-        box.size = {1.0f, 1.0f, 1.0f};
-
-        // Assign random x-velocity between -1.0f and 1.0f
-        float randomXVelocity = -1.0f + static_cast<float>(rand()) / (static_cast<float>(RAND_MAX / 2.0f));
-        box.velocity = {randomXVelocity, 0.0f, 0.0f};
-
-        // Assign a random color to the box
-        box.colour.x = static_cast<float>(rand()) / static_cast<float>(RAND_MAX);
-        box.colour.y = static_cast<float>(rand()) / static_cast<float>(RAND_MAX);
-        box.colour.z = static_cast<float>(rand()) / static_cast<float>(RAND_MAX);
-
-        boxes.push_back(box);
+        boxes.push_back(_boxManager->CreateBox());
     }
 }
 
