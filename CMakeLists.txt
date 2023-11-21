@@ -8,5 +8,8 @@ find_package(GLUT)
 
 include_directories(${GLUT_INCLUDE_DIRS} ${OPENGL_INCLUDE_DIR} ${OPEN_EGL_INCLUDE_DIRS})
 
-add_executable(LinuxPort main.cpp)
+add_executable(LinuxPort main.cpp
+        Vec3.h
+        Boxes.cpp
+        Boxes.h)
 target_link_libraries(LinuxPort ${GLUT_LIBRARIES} ${OPENGL_LIBRARIES})

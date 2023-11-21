@@ -17,7 +17,7 @@
 #include <stdio.h>
 #include <sys/types.h>
 #include <string.h>
-
+#include "Boxes.h"
 using namespace std::chrono;
 
 // this is the number of falling physical items.
@@ -38,43 +38,6 @@ using namespace std::chrono;
 #define minZ -30.0f
 #define maxZ 30.0f
 
-class Vec3 {
-public:
-    float x, y, z;
-
-    Vec3() : x(0.0f), y(0.0f), z(0.0f) {}
-    Vec3(float x, float y, float z) : x(x), y(y), z(z) {}
-
-    // overload the minus operator
-    Vec3 operator-(const Vec3& other) const {
-        return Vec3(x - other.x, y - other.y, z - other.z);
-    }
-
-    // Normalize the vector
-    void normalise() {
-        float length = std::sqrt(x * x + y * y + z * z);
-        if (length != 0) {
-            x /= length;
-            y /= length;
-            z /= length;
-        }
-    }
-
-    // get the length of a vector
-    float length() const {
-        return std::sqrt(x * x + y * y + z * z);
-    }
-};
-
-// the box (falling item)
-struct Box {
-    Vec3 position;
-    Vec3 size;
-    Vec3 velocity;
-    Vec3 colour;
-};
-
-
 // gravity - change it and see what happens (usually negative!)
 const float gravity = -19.81f;
 std::vector<Box> boxes;
@@ -90,7 +53,6 @@ void ForkExample()
         printf("Hello from Parent!\n");
     }
 }
-
 
 #define ReadEnd 0
 #define WriteEnd 1
@@ -126,7 +88,6 @@ void PipeExample()
     }
 }
 
-
 void *print_message_function( void *ptr )
 {
     char *message;
@@ -152,6 +113,9 @@ void PThreadsExample()
 }
 
 void initScene(int boxCount) {
+    pthread_t physThread1, physThread2, physThread3;
+    int pt1,pt2,pt3;
+
     for (int i = 0; i < boxCount; ++i) {
         Box box;
 
@@ -469,6 +433,7 @@ int main(int argc, char** argv) {
     glMatrixMode(GL_MODELVIEW);
 
     initScene(NUMBER_OF_BOXES);
+    //ForkExample();
     //PipeExample();
     PThreadsExample();
     glutDisplayFunc(display);
