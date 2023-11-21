@@ -330,14 +330,14 @@ void idle() {
     const duration<float> frameTime = last - old;
     float deltaTime = frameTime.count();
 
+    //update physics
     float *dt = &deltaTime;
     pt1 = pthread_create(&thread1, NULL, updatePhysics, (void*)dt);
-    //updatePhysics(deltaTime);
-
     // tell glut to draw - note this will cap this function at 60 fps
-    glutPostRedisplay();
+    pt2 = pthread_create(&thread2, NULL, reinterpret_cast<void *(*)(void *)>(glutPostRedisplay), NULL);
 
     pthread_join(thread1, NULL);
+    pthread_join(thread2, NULL);
 }
 
 // called the mouse button is tapped
