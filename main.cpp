@@ -126,6 +126,31 @@ void PipeExample()
     }
 }
 
+
+void *print_message_function( void *ptr )
+{
+    char *message;
+    message = (char *) ptr;
+    printf("%s \n", message);
+}
+
+void PThreadsExample()
+{
+    pthread_t thread1,thread2;
+
+    char *message1 = "Thread 1";
+    char *message2 = "Thread 2";
+    int  pt1, pt2;
+
+    pt1 = pthread_create( &thread1, NULL, print_message_function, (void*) message1);
+    pt2 = pthread_create( &thread2, NULL, print_message_function, (void*) message2);
+    pthread_join( thread1, NULL);
+    pthread_join( thread2, NULL);
+
+    printf("Thread 1 returns: %d\n",pt1);
+    printf("Thread 2 returns: %d\n",pt2);
+}
+
 void initScene(int boxCount) {
     for (int i = 0; i < boxCount; ++i) {
         Box box;
@@ -248,28 +273,7 @@ bool checkCollision(const Box& a, const Box& b) {
 // update the physics: gravity, collision test, collision resolution
 void updatePhysics(const float deltaTime) {
     const float floorY = 0.0f;
-    /*
-    int fd1[2];
-    pid_t p1 = fork(); //first child
-    pid_t p2 = fork(); //second child + grandchild/third child (first child also executes this line)
 
-    if(p1 > 0 && p2 > 0)
-    {
-        //parent process
-    }
-    else if(p1 == 0 && p2 > 0)
-    {
-        //first child
-    }
-    else if(p1 > 0 && p2 == 0)
-    {
-        //second child
-    }
-    else
-    {
-        //third child
-    }
-    */
     for (Box& box : boxes) {
         // Update velocity due to gravity
         box.velocity.y += gravity * deltaTime;
@@ -465,7 +469,8 @@ int main(int argc, char** argv) {
     glMatrixMode(GL_MODELVIEW);
 
     initScene(NUMBER_OF_BOXES);
-    PipeExample();
+    //PipeExample();
+    PThreadsExample();
     glutDisplayFunc(display);
     glutIdleFunc(idle);
     // it will stick here until the program ends.
