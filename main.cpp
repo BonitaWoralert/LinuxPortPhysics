@@ -33,14 +33,8 @@ using namespace std::chrono;
 #define LOOKDIR_Y 0
 #define LOOKDIR_Z 0
 
-#define minX -10.0f
-#define maxX 30.0f
-#define minZ -30.0f
-#define maxZ 30.0f
-
-// gravity - change it and see what happens (usually negative!)
-const float gravity = -19.81f;
 std::vector<Box> boxes;
+auto* _boxManager = new BoxManager();
 
 void ForkExample()
 {
@@ -88,37 +82,8 @@ void PipeExample()
     }
 }
 
-void *print_message_function( void *ptr )
-{
-    char *message;
-    message = (char *) ptr;
-    printf("%s \n", message);
-}
-
-void PThreadsExample()
-{
-    pthread_t thread1,thread2;
-
-    char *message1 = "Thread 1";
-    char *message2 = "Thread 2";
-    int  pt1, pt2;
-
-    pt1 = pthread_create( &thread1, NULL, print_message_function, (void*) message1);
-    pt2 = pthread_create( &thread2, NULL, print_message_function, (void*) message2);
-    pthread_join( thread1, NULL);
-    pthread_join( thread2, NULL);
-
-    printf("Thread 1 returns: %d\n",pt1);
-    printf("Thread 2 returns: %d\n",pt2);
-}
 
 void initScene(int boxCount) {
-    //declare everything for threads
-    pthread_t physThread1, physThread2, physThread3;
-    int pt1,pt2,pt3;
-
-    auto* _boxManager = new BoxManager();
-
     for (int i = 0; i < boxCount; ++i) {
         boxes.push_back(_boxManager->CreateBox());
     }
@@ -177,7 +142,6 @@ Vec3 screenToWorld(int x, int y) {
     return Vec3((float)posX, (float)posY, (float)posZ);
 }
 
-
 // if two boxes collide, push them away from each other
 void resolveCollision(Box& a, Box& b) {
     Vec3 normal = { a.position.x - b.position.x, a.position.y - b.position.y, a.position.z - b.position.z };
@@ -219,33 +183,38 @@ bool checkCollision(const Box& a, const Box& b) {
            (std::abs(a.position.z - b.position.z) * 2 < (a.size.z + b.size.z));
 }
 
+void *print_message_function( void *ptr )
+{
+    char *message;
+    message = (char *) ptr;
+    printf("%s \n", message);
+}
+
+void PThreadsExample()
+{
+    pthread_t thread1,thread2;
+
+    char *message1 = "Thread 1";
+    char *message2 = "Thread 2";
+    int  pt1, pt2;
+
+    pt1 = pthread_create( &thread1, NULL, print_message_function, (void*) message1);
+    pt2 = pthread_create( &thread2, NULL, print_message_function, (void*) message2);
+    pthread_join( thread1, NULL);
+    pthread_join( thread2, NULL);
+
+    printf("Thread 1 returns: %d\n",pt1);
+    printf("Thread 2 returns: %d\n",pt2);
+}
+
 // update the physics: gravity, collision test, collision resolution
-void updatePhysics(const float deltaTime) {
-    const float floorY = 0.0f;
+void *updatePhysics(void *ptr) {
+
+    float *deltaTime;
+    deltaTime = (float *) ptr;
 
     for (Box& box : boxes) {
-        // Update velocity due to gravity
-        box.velocity.y += gravity * deltaTime;
-
-        // Update position based on velocity
-        box.position.x += box.velocity.x * deltaTime;
-        box.position.y += box.velocity.y * deltaTime;
-        box.position.z += box.velocity.z * deltaTime;
-
-        // Check for collision with the floor
-        if (box.position.y - box.size.y / 2.0f < floorY) {
-            box.position.y = floorY + box.size.y / 2.0f;
-            float dampening = 0.7f;
-            box.velocity.y = -box.velocity.y * dampening;
-        }
-
-        // Check for collision with the walls
-        if (box.position.x - box.size.x / 2.0f < minX || box.position.x + box.size.x / 2.0f > maxX) {
-            box.velocity.x = -box.velocity.x;
-        }
-        if (box.position.z - box.size.z / 2.0f < minZ || box.position.z + box.size.z / 2.0f > maxZ) {
-            box.velocity.z = -box.velocity.z;
-        }
+        _boxManager->Update(box, *deltaTime); //update box
 
         // Check for collisions with other boxes
         for (Box& other : boxes) {
@@ -257,6 +226,23 @@ void updatePhysics(const float deltaTime) {
         }
     }
 }
+
+/*// update the physics: gravity, collision test, collision resolution
+void updatePhysics(const float deltaTime) {
+
+    for (Box& box : boxes) {
+        _boxManager->Update(box, deltaTime); //update box
+
+        // Check for collisions with other boxes
+        for (Box& other : boxes) {
+            if (&box == &other) continue;
+            if (checkCollision(box, other)) {
+                resolveCollision(box, other);
+                break;
+            }
+        }
+    }
+}*/
 
 // draw the sides of the containing area
 void drawQuad(const Vec3& v1, const Vec3& v2, const Vec3& v3, const Vec3& v4) {
@@ -332,19 +318,26 @@ void display() {
     glutSwapBuffers();
 }
 
+pthread_t thread1,thread2;
+int pt1, pt2;
+
 // called by GLUT when the cpu is idle - has a timer function you can use for FPS, and updates the physics
 // see https://www.opengl.org/resources/libraries/glut/spec3/node63.html#:~:text=glutIdleFunc
-// NOTE this may be capped at 60 fps as we are using glutPostRedisplay(). If you want it to go higher than this, maybe a thread will help here.
 void idle() {
     static auto last = steady_clock::now();
     auto old = last;
     last = steady_clock::now();
     const duration<float> frameTime = last - old;
     float deltaTime = frameTime.count();
-    updatePhysics(deltaTime);
+
+    float *dt = &deltaTime;
+    pt1 = pthread_create(&thread1, NULL, updatePhysics, (void*)dt);
+    //updatePhysics(deltaTime);
 
     // tell glut to draw - note this will cap this function at 60 fps
     glutPostRedisplay();
+
+    pthread_join(thread1, NULL);
 }
 
 // called the mouse button is tapped
@@ -420,7 +413,7 @@ int main(int argc, char** argv) {
     initScene(NUMBER_OF_BOXES);
     //ForkExample();
     //PipeExample();
-    PThreadsExample();
+    //PThreadsExample();
     glutDisplayFunc(display);
     glutIdleFunc(idle);
     // it will stick here until the program ends.

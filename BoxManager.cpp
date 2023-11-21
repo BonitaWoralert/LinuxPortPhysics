@@ -25,3 +25,28 @@ Box BoxManager::CreateBox() {
 
     return box;
 }
+
+void BoxManager::Update(Box& box, float deltaTime) {
+    // Update velocity due to gravity
+    box.velocity.y += gravity * deltaTime;
+
+    // Update position based on velocity
+    box.position.x += box.velocity.x * deltaTime;
+    box.position.y += box.velocity.y * deltaTime;
+    box.position.z += box.velocity.z * deltaTime;
+
+    // Check for collision with the floor
+    if (box.position.y - box.size.y / 2.0f < floorY) {
+        box.position.y = floorY + box.size.y / 2.0f;
+        float dampening = 0.7f;
+        box.velocity.y = -box.velocity.y * dampening;
+    }
+
+    // Check for collision with the walls
+    if (box.position.x - box.size.x / 2.0f < minX || box.position.x + box.size.x / 2.0f > maxX) {
+        box.velocity.x = -box.velocity.x;
+    }
+    if (box.position.z - box.size.z / 2.0f < minZ || box.position.z + box.size.z / 2.0f > maxZ) {
+        box.velocity.z = -box.velocity.z;
+    }
+}
