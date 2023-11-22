@@ -1,10 +1,3 @@
-// TODO
-// Tidy and label the code
-// add memory chunks to the box
-// C++ it all
-// convert to PS4? (or make this a student task?) - check out the PS4 SDK samples
-// rename project etc.
-
 
 #include <stdlib.h>
 #include <GL/glut.h>
@@ -18,12 +11,13 @@
 #include <sys/types.h>
 #include <string.h>
 #include "BoxManager.h"
+#include "Collisions.h"
 using namespace std::chrono;
 
 // this is the number of falling physical items.
 #define NUMBER_OF_BOXES 50
 
-// these is where the camera is, where it is looking and the bounds of the continaing box. You shouldn't need to alter these
+// this is where the camera is, where it is looking and the bounds of the continaing box. You shouldn't need to alter these
 
 #define LOOKAT_X 10
 #define LOOKAT_Y 10
@@ -34,7 +28,10 @@ using namespace std::chrono;
 #define LOOKDIR_Z 0
 
 std::vector<Box> boxes;
-auto* _boxManager = new BoxManager();
+auto* boxManager = new BoxManager();
+auto* collisionHandler = new Collisions();
+
+#pragma region examples
 
 void ForkExample()
 {
@@ -83,9 +80,35 @@ void PipeExample()
 }
 
 
+void *print_message_function( void *ptr )
+{
+    char *message;
+    message = (char *) ptr;
+    printf("%s \n", message);
+}
+
+void PThreadsExample()
+{
+    pthread_t thread1,thread2;
+
+    char *message1 = "Thread 1";
+    char *message2 = "Thread 2";
+    int  pt1, pt2;
+
+    pt1 = pthread_create( &thread1, NULL, print_message_function, (void*) message1);
+    pt2 = pthread_create( &thread2, NULL, print_message_function, (void*) message2);
+    pthread_join( thread1, NULL);
+    pthread_join( thread2, NULL);
+
+    printf("Thread 1 returns: %d\n",pt1);
+    printf("Thread 2 returns: %d\n",pt2);
+}
+
+#pragma endregion
+
 void initScene(int boxCount) {
     for (int i = 0; i < boxCount; ++i) {
-        boxes.push_back(_boxManager->CreateBox());
+        boxes.push_back(boxManager->CreateBox());
     }
 }
 
@@ -142,71 +165,6 @@ Vec3 screenToWorld(int x, int y) {
     return Vec3((float)posX, (float)posY, (float)posZ);
 }
 
-// if two boxes collide, push them away from each other
-void resolveCollision(Box& a, Box& b) {
-    Vec3 normal = { a.position.x - b.position.x, a.position.y - b.position.y, a.position.z - b.position.z };
-    float length = std::sqrt(normal.x * normal.x + normal.y * normal.y + normal.z * normal.z);
-
-    // Normalize the normal vector
-    normal.normalise();
-
-    float relativeVelocityX = a.velocity.x - b.velocity.x;
-    float relativeVelocityY = a.velocity.y - b.velocity.y;
-    float relativeVelocityZ = a.velocity.z - b.velocity.z;
-
-    // Compute the relative velocity along the normal
-    float impulse = relativeVelocityX * normal.x + relativeVelocityY * normal.y + relativeVelocityZ * normal.z;
-
-    // Ignore collision if objects are moving away from each other
-    if (impulse > 0) {
-        return;
-    }
-
-    // Compute the collision impulse scalar
-    float e = 0.01f; // Coefficient of restitution (0 = inelastic, 1 = elastic)
-    float dampening = 0.9f; // Dampening factor (0.9 = 10% energy reduction)
-    float j = -(1.0f + e) * impulse * dampening;
-
-    // Apply the impulse to the boxes' velocities
-    a.velocity.x += j * normal.x;
-    a.velocity.y += j * normal.y;
-    a.velocity.z += j * normal.z;
-    b.velocity.x -= j * normal.x;
-    b.velocity.y -= j * normal.y;
-    b.velocity.z -= j * normal.z;
-}
-
-// are two boxes colliding?
-bool checkCollision(const Box& a, const Box& b) {
-    return (std::abs(a.position.x - b.position.x) * 2 < (a.size.x + b.size.x)) &&
-           (std::abs(a.position.y - b.position.y) * 2 < (a.size.y + b.size.y)) &&
-           (std::abs(a.position.z - b.position.z) * 2 < (a.size.z + b.size.z));
-}
-
-void *print_message_function( void *ptr )
-{
-    char *message;
-    message = (char *) ptr;
-    printf("%s \n", message);
-}
-
-void PThreadsExample()
-{
-    pthread_t thread1,thread2;
-
-    char *message1 = "Thread 1";
-    char *message2 = "Thread 2";
-    int  pt1, pt2;
-
-    pt1 = pthread_create( &thread1, NULL, print_message_function, (void*) message1);
-    pt2 = pthread_create( &thread2, NULL, print_message_function, (void*) message2);
-    pthread_join( thread1, NULL);
-    pthread_join( thread2, NULL);
-
-    printf("Thread 1 returns: %d\n",pt1);
-    printf("Thread 2 returns: %d\n",pt2);
-}
-
 // update the physics: gravity, collision test, collision resolution
 void *updatePhysics(void *ptr) {
 
@@ -214,35 +172,18 @@ void *updatePhysics(void *ptr) {
     deltaTime = (float *) ptr;
 
     for (Box& box : boxes) {
-        _boxManager->Update(box, *deltaTime); //update box
+        boxManager->Update(box, *deltaTime); //update box
 
         // Check for collisions with other boxes
         for (Box& other : boxes) {
             if (&box == &other) continue;
-            if (checkCollision(box, other)) {
-                resolveCollision(box, other);
+            if (collisionHandler->checkCollision(box, other)) {
+                collisionHandler->resolveCollision(box, other);
                 break;
             }
         }
     }
 }
-
-/*// update the physics: gravity, collision test, collision resolution
-void updatePhysics(const float deltaTime) {
-
-    for (Box& box : boxes) {
-        _boxManager->Update(box, deltaTime); //update box
-
-        // Check for collisions with other boxes
-        for (Box& other : boxes) {
-            if (&box == &other) continue;
-            if (checkCollision(box, other)) {
-                resolveCollision(box, other);
-                break;
-            }
-        }
-    }
-}*/
 
 // draw the sides of the containing area
 void drawQuad(const Vec3& v1, const Vec3& v2, const Vec3& v3, const Vec3& v4) {

@@ -11,5 +11,7 @@ include_directories(${GLUT_INCLUDE_DIRS} ${OPENGL_INCLUDE_DIR} ${OPEN_EGL_INCLUD
 add_executable(LinuxPort main.cpp
         Vec3.h
         BoxManager.cpp
-        BoxManager.h)
+        BoxManager.h
+        Collisions.cpp
+        Collisions.h)
 target_link_libraries(LinuxPort ${GLUT_LIBRARIES} ${OPENGL_LIBRARIES})

@@ -1,7 +1,3 @@
-//
-// Created by bonita on 21/11/23.
-//
-
 #include "BoxManager.h"
 
 Box BoxManager::CreateBox() {
