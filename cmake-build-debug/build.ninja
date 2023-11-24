@@ -67,6 +67,12 @@ build CMakeFiles/LinuxPort.dir/Collisions.cpp.o: CXX_COMPILER__LinuxPort_unscann
   OBJECT_DIR = CMakeFiles/LinuxPort.dir
   OBJECT_FILE_DIR = CMakeFiles/LinuxPort.dir
 
+build CMakeFiles/LinuxPort.dir/Application.cpp.o: CXX_COMPILER__LinuxPort_unscanned_Debug /home/bonita/CLionProjects/LinuxPort/Application.cpp || cmake_object_order_depends_target_LinuxPort
+  DEP_FILE = CMakeFiles/LinuxPort.dir/Application.cpp.o.d
+  FLAGS = -g -fdiagnostics-color=always
+  OBJECT_DIR = CMakeFiles/LinuxPort.dir
+  OBJECT_FILE_DIR = CMakeFiles/LinuxPort.dir
+
 
 # =============================================================================
 # Link build statements for EXECUTABLE target LinuxPort
@@ -75,7 +81,7 @@ build CMakeFiles/LinuxPort.dir/Collisions.cpp.o: CXX_COMPILER__LinuxPort_unscann
 #############################################
 # Link the executable LinuxPort
 
-build LinuxPort: CXX_EXECUTABLE_LINKER__LinuxPort_Debug CMakeFiles/LinuxPort.dir/main.cpp.o CMakeFiles/LinuxPort.dir/BoxManager.cpp.o CMakeFiles/LinuxPort.dir/Collisions.cpp.o | /usr/lib/x86_64-linux-gnu/libglut.so /usr/lib/x86_64-linux-gnu/libOpenGL.so /usr/lib/x86_64-linux-gnu/libGLX.so /usr/lib/x86_64-linux-gnu/libGLU.so
+build LinuxPort: CXX_EXECUTABLE_LINKER__LinuxPort_Debug CMakeFiles/LinuxPort.dir/main.cpp.o CMakeFiles/LinuxPort.dir/BoxManager.cpp.o CMakeFiles/LinuxPort.dir/Collisions.cpp.o CMakeFiles/LinuxPort.dir/Application.cpp.o | /usr/lib/x86_64-linux-gnu/libglut.so /usr/lib/x86_64-linux-gnu/libOpenGL.so /usr/lib/x86_64-linux-gnu/libGLX.so /usr/lib/x86_64-linux-gnu/libGLU.so
   FLAGS = -g
   LINK_LIBRARIES = /usr/lib/x86_64-linux-gnu/libglut.so  /usr/lib/x86_64-linux-gnu/libOpenGL.so  /usr/lib/x86_64-linux-gnu/libGLX.so  /usr/lib/x86_64-linux-gnu/libGLU.so
   OBJECT_DIR = CMakeFiles/LinuxPort.dir

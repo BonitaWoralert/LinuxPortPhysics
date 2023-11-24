@@ -13,5 +13,7 @@ add_executable(LinuxPort main.cpp
         BoxManager.cpp
         BoxManager.h
         Collisions.cpp
-        Collisions.h)
+        Collisions.h
+        Application.cpp
+        Application.h)
 target_link_libraries(LinuxPort ${GLUT_LIBRARIES} ${OPENGL_LIBRARIES})
