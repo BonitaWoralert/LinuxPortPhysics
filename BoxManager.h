@@ -1,7 +1,3 @@
-//
-// Created by bonita on 21/11/23.
-//
-
 #ifndef LINUXPORT_BOXMANAGER_H
 #define LINUXPORT_BOXMANAGER_H
 #include "Vec3.h"

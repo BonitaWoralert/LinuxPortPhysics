@@ -1,13 +1,5 @@
 #include "Application.h"
 
-Application::Application() {
-
-}
-
-Application::~Application() {
-
-}
-
 void Application::initScene(int boxCount) {
     for (int i = 0; i < boxCount; ++i) {
         boxes.push_back(boxManager->CreateBox());
@@ -162,4 +154,5 @@ void Application::idle() {
     pthread_join(thread1, NULL);
     pthread_join(thread2, NULL);
 }
+
 
