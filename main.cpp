@@ -1,19 +1,6 @@
 #include "Application.h"
 
-// this is the number of falling physical items.
-#define NUMBER_OF_BOXES 50
-
-// this is where the camera is, where it is looking and the bounds of the box. You shouldn't need to alter these
-
-#define LOOKAT_X 10
-#define LOOKAT_Y 10
-#define LOOKAT_Z 50
-
-#define LOOKDIR_X 10
-#define LOOKDIR_Y 0
-#define LOOKDIR_Z 0
-
-auto* app = new Application();
+auto* app = new Application(); //create application
 
 #pragma region examples of multithreading
 
@@ -98,11 +85,8 @@ void idle() {
 void display() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glLoadIdentity();
-
     gluLookAt(LOOKAT_X, LOOKAT_Y, LOOKAT_Z, LOOKDIR_X, LOOKDIR_Y, LOOKDIR_Z, 0, 1, 0);
-
     app->drawScene();
-
     glutSwapBuffers();
 }
 
