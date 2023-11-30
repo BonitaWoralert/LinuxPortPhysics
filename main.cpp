@@ -138,6 +138,9 @@ void keyboard(unsigned char key, int x, int y) {
             box.velocity.y += impulseMagnitude;
         }
     }
+    if(key == '1') {
+        std::cout << "\nFPS = " << 1/app->GetDeltaTime();
+    }
 }
 
 // the main function.

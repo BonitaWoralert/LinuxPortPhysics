@@ -147,9 +147,11 @@ void Application::idle() {
 
     //update physics
     pt1 = pthread_create(&thread1, NULL, Application::updatePhysicsStatic, this);
+    //updatePhysics();
 
     // tell glut to draw - note this will cap this function at 60 fps
     pt2 = pthread_create(&thread2, NULL, reinterpret_cast<void *(*)(void *)>(glutPostRedisplay), NULL);
+    //glutPostRedisplay();
 
     pthread_join(thread1, NULL);
     pthread_join(thread2, NULL);

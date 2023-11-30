@@ -13,7 +13,7 @@
 using namespace std::chrono;
 
 // this is the number of falling physical items.
-#define NUMBER_OF_BOXES 50
+#define NUMBER_OF_BOXES 500
 // this is where the camera is, where it is looking and the bounds of the box. You shouldn't need to alter these
 
 #define LOOKAT_X 10
@@ -39,9 +39,8 @@ public:
     void drawScene();
     void idle();
     std::vector<Box> boxes;
-    //std::vector<Box> getBoxes() {return boxes;}
+    float GetDeltaTime() { return deltaTime;}
 private:
-
     BoxManager* boxManager = new BoxManager();
     Collisions* collisionHandler = new Collisions();
     pthread_t thread1{},thread2{};
